@@ -16,13 +16,17 @@ jobs:
           java-version: '17'
 
       - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
 
       - name: Build debug APK
         run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          DIR=$(dirname "$(find . -name settings.gradle | head -n 1)")
+          echo "Project folder: $DIR"
+          cd "$DIR"
+          gradle assembleDebug --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
           name: FarsiVoiceKeyboard-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: '**/app/build/outputs/apk/debug/*.apk'
