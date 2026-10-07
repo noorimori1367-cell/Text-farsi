@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implementation-Title: Gradle Wrapper
+Main-Class: org.gradle.wrapper.GradleWrapperMain
+Enable-Native-Access: ALL-UNNAMED
+
