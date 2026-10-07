@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">تایپ صوتی فارسی</string>
+    <string name="ime_name">کیبورد صوتی فارسی</string>
+
+    <!-- keyboard status -->
+    <string name="status_idle">روی میکروفون بزنید و صحبت کنید • نگه‌داشتن = حالت پیوسته</string>
+    <string name="status_need_permission">برای شروع روی میکروفون بزنید و اجازه دسترسی بدهید</string>
+    <string name="status_starting">در حال آماده‌شدن…</string>
+    <string name="status_listening">بگویید… (برای پایان دوباره بزنید)</string>
+    <string name="status_listening_cont">حالت پیوسته: بگویید… (برای توقف بزنید)</string>
+    <string name="status_processing">در حال تبدیل به متن…</string>
+    <string name="status_done">✓ نوشته شد • برای ادامه دوباره بزنید</string>
+    <string name="lang_now_fa">زبان: فارسی</string>
+    <string name="lang_now_en">Language: English</string>
+
+    <!-- errors -->
+    <string name="err_no_match">چیزی شنیده نشد؛ دوباره امتحان کنید</string>
+    <string name="err_network">اینترنت در دسترس نیست یا سرور جواب نداد</string>
+    <string name="err_permission">اجازه میکروفون داده نشده؛ برنامه را باز کنید</string>
+    <string name="err_audio">میکروفون در دسترس نیست (شاید برنامه دیگری از آن استفاده می‌کند)</string>
+    <string name="err_language">زبان فارسی روی سرویس تشخیص گفتار گوشی فعال نیست</string>
+    <string name="err_no_service">سرویس تشخیص گفتار روی گوشی نیست؛ برنامه Google را نصب یا به‌روز کنید</string>
+    <string name="err_generic">خطا رخ داد؛ دوباره امتحان کنید</string>
+
+    <!-- setup screen -->
+    <string name="setup_title">تایپ صوتی فارسی</string>
+    <string name="setup_subtitle">صحبت کنید، متن تحویل بگیرید — در تلگرام، واتس‌اپ، پیامک و هر جای دیگر.</string>
+    <string name="step1_title">۱. اجازه میکروفون</string>
+    <string name="step1_desc">برای شنیدن صدای شما لازم است.</string>
+    <string name="step1_btn">اجازه بده</string>
+    <string name="step2_title">۲. فعال‌کردن کیبورد</string>
+    <string name="step2_desc">در صفحه‌ای که باز می‌شود «کیبورد صوتی فارسی» را روشن کنید.</string>
+    <string name="step2_btn">باز کردن تنظیمات</string>
+    <string name="step3_title">۳. انتخاب کیبورد</string>
+    <string name="step3_desc">«کیبورد صوتی فارسی» را از فهرست انتخاب کنید.</string>
+    <string name="step3_btn">انتخاب کیبورد</string>
+    <string name="step_done">✓ انجام شد</string>
+    <string name="step_todo">انجام نشده</string>
+    <string name="step_wait">اول مرحله قبل</string>
+    <string name="warning_no_service">⚠ سرویس تشخیص گفتار گوگل روی این گوشی پیدا نشد. برنامه Google را از مارکت نصب یا به‌روزرسانی کنید.</string>
+    <string name="test_title">امتحان کنید</string>
+    <string name="test_hint">اینجا بزنید، کیبورد صوتی بالا می‌آید…</string>
+    <string name="tips_title">راهنما</string>
+    <string name="tips_body">• میکروفون: یک بار بزنید، صحبت کنید؛ بعد از مکث خودش می‌نویسد.\n• نگه‌داشتن میکروفون: حالت پیوسته — تا وقتی دوباره نزنید گوش می‌دهد.\n• دکمه کره 🌐: برگشت به کیبورد معمولی خودتان (نگه‌داشتن = فهرست کیبوردها).\n• دکمه «فا / EN»: تغییر زبان گفتار.\n• برای تبدیل صدا به اینترنت نیاز است.</string>
+</resources>

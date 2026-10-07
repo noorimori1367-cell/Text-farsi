@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/kb_bg"
+    android:clipChildren="false"
+    android:layoutDirection="ltr"
+    android:orientation="vertical"
+    android:paddingLeft="8dp"
+    android:paddingTop="8dp"
+    android:paddingRight="8dp"
+    android:paddingBottom="10dp">
+
+    <!-- status line -->
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="2"
+        android:minHeight="36dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:textColor="@color/kb_text_dim"
+        android:textDirection="rtl"
+        android:textSize="13sp" />
+
+    <!-- main row: globe | lang | MIC | backspace | enter -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="108dp"
+        android:clipChildren="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/globe"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/key_bg"
+            android:contentDescription="کیبورد قبلی"
+            android:scaleType="center"
+            android:src="@drawable/ic_globe" />
+
+        <TextView
+            android:id="@+id/lang"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/key_bg"
+            android:gravity="center"
+            android:textColor="@color/kb_text"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.6"
+            android:clipChildren="false">
+
+            <View
+                android:id="@+id/mic_ring"
+                android:layout_width="84dp"
+                android:layout_height="84dp"
+                android:layout_gravity="center"
+                android:background="@drawable/mic_ring"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/mic"
+                android:layout_width="78dp"
+                android:layout_height="78dp"
+                android:layout_gravity="center"
+                android:background="@drawable/mic_bg"
+                android:contentDescription="میکروفون"
+                android:elevation="4dp"
+                android:padding="20dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_mic" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/backspace"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/key_bg"
+            android:contentDescription="پاک کردن"
+            android:scaleType="center"
+            android:src="@drawable/ic_backspace" />
+
+        <ImageView
+            android:id="@+id/enter"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_margin="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/key_bg"
+            android:contentDescription="ارسال / خط بعد"
+            android:scaleType="center"
+            android:src="@drawable/ic_enter" />
+    </LinearLayout>
+
+    <!-- bottom row: punctuation + space -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/p1"
+            style="@style/PunctKey" />
+
+        <TextView
+            android:id="@+id/p2"
+            style="@style/PunctKey" />
+
+        <ImageView
+            android:id="@+id/space"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            android:layout_weight="3"
+            android:background="@drawable/key_bg"
+            android:contentDescription="فاصله"
+            android:scaleType="center"
+            android:src="@drawable/ic_space" />
+
+        <TextView
+            android:id="@+id/p3"
+            style="@style/PunctKey" />
+
+        <TextView
+            android:id="@+id/p4"
+            style="@style/PunctKey" />
+    </LinearLayout>
+</LinearLayout>

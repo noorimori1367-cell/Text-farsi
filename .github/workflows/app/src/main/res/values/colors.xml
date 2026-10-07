@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="kb_bg">#FF1B1C21</color>
+    <color name="kb_key">#FF2D2F37</color>
+    <color name="kb_key_pressed">#FF40434E</color>
+    <color name="kb_text">#FFECEDF1</color>
+    <color name="kb_text_dim">#FF9EA1AC</color>
+    <color name="accent">#FF3D7BF5</color>
+    <color name="accent_pressed">#FF2A62D0</color>
+    <color name="rec">#FFE5484D</color>
+    <color name="rec_ring">#55E5484D</color>
+
+    <color name="bg">#FFF4F5F8</color>
+    <color name="card">#FFFFFFFF</color>
+    <color name="text">#FF1B1C21</color>
+    <color name="text_secondary">#FF6B6F7B</color>
+    <color name="ok">#FF1E9E5A</color>
+    <color name="warn_bg">#FFFFF3E0</color>
+    <color name="warn_text">#FF9A4A00</color>
+</resources>

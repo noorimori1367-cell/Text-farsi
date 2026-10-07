@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layoutDirection="rtl"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:textDirection="rtl">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/setup_title"
+            android:textColor="@color/text"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="4dp"
+            android:text="@string/setup_subtitle"
+            android:textColor="@color/text_secondary"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/warn_bg"
+            android:padding="12dp"
+            android:text="@string/warning_no_service"
+            android:textColor="@color/warn_text"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <!-- step 1 -->
+        <LinearLayout style="@style/Card">
+            <TextView style="@style/StepTitle" android:text="@string/step1_title" />
+            <TextView style="@style/StepDesc" android:text="@string/step1_desc" />
+            <TextView android:id="@+id/st1" style="@style/StepStatus" />
+            <Button android:id="@+id/btn_perm" style="@style/StepButton" android:text="@string/step1_btn" />
+        </LinearLayout>
+
+        <!-- step 2 -->
+        <LinearLayout style="@style/Card">
+            <TextView style="@style/StepTitle" android:text="@string/step2_title" />
+            <TextView style="@style/StepDesc" android:text="@string/step2_desc" />
+            <TextView android:id="@+id/st2" style="@style/StepStatus" />
+            <Button android:id="@+id/btn_enable" style="@style/StepButton" android:text="@string/step2_btn" />
+        </LinearLayout>
+
+        <!-- step 3 -->
+        <LinearLayout style="@style/Card">
+            <TextView style="@style/StepTitle" android:text="@string/step3_title" />
+            <TextView style="@style/StepDesc" android:text="@string/step3_desc" />
+            <TextView android:id="@+id/st3" style="@style/StepStatus" />
+            <Button android:id="@+id/btn_choose" style="@style/StepButton" android:text="@string/step3_btn" />
+        </LinearLayout>
+
+        <!-- test -->
+        <LinearLayout style="@style/Card">
+            <TextView style="@style/StepTitle" android:text="@string/test_title" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/input_bg"
+                android:gravity="top|start"
+                android:hint="@string/test_hint"
+                android:inputType="textMultiLine|textCapSentences"
+                android:minLines="3"
+                android:padding="12dp"
+                android:textColor="@color/text"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- tips -->
+        <LinearLayout style="@style/Card" android:layout_marginBottom="24dp">
+            <TextView style="@style/StepTitle" android:text="@string/tips_title" />
+            <TextView
+                style="@style/StepDesc"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="6dp"
+                android:text="@string/tips_body" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
