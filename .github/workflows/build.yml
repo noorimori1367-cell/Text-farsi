@@ -25,8 +25,11 @@ jobs:
           echo "Project folder: $DIR"
           cd "$DIR"
           gradle assembleDebug --no-daemon
+          mkdir -p "$GITHUB_WORKSPACE/apk"
+          cp app/build/outputs/apk/debug/*.apk "$GITHUB_WORKSPACE/apk/FarsiVoiceKeyboard.apk"
 
       - uses: actions/upload-artifact@v4
         with:
           name: FarsiVoiceKeyboard-apk
-          path: '**/app/build/outputs/apk/debug/*.apk'
+          path: apk/FarsiVoiceKeyboard.apk
+          if-no-files-found: error
