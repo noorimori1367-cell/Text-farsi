@@ -14,17 +14,27 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.text.TextUtils;
+import android.graphics.Color;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Voice keyboard: tap the mic, speak, and the recognised text is typed
@@ -56,6 +66,17 @@ public class VoiceIme extends InputMethodService implements RecognitionListener 
     private TextView[] punctKeys;
 
     private SharedPreferences prefs;
+
+    // emoji panel
+    private LinearLayout voicePanel;   // status + mic row + bottom row
+    private LinearLayout emojiPanel;
+    private GridView emojiGrid;
+    private EmojiAdapter emojiAdapter;
+    private final List<TextView> emojiTabs = new ArrayList<>();
+    private int emojiCategory = -1;
+    private final ArrayList<String> recents = new ArrayList<>();
+    private static final int MAX_RECENTS = 40;
+    private static final String SEP = "\u0001";
 
     // ---------------------------------------------------------------- setup
 
@@ -123,7 +144,7 @@ public class VoiceIme extends InputMethodService implements RecognitionListener 
 
         updateLangUi();
         updateMicUi();
-        return v;
+        return buildRootWithEmoji(v);
     }
 
     @Override
@@ -136,6 +157,7 @@ public class VoiceIme extends InputMethodService implements RecognitionListener 
     @Override
     public void onFinishInputView(boolean finishingInput) {
         cancelRecognition();
+        showVoicePanel();
         super.onFinishInputView(finishingInput);
     }
 
@@ -370,6 +392,12 @@ public class VoiceIme extends InputMethodService implements RecognitionListener 
         CharSequence sel = ic.getSelectedText(0);
         if (!TextUtils.isEmpty(sel)) {
             ic.commitText("", 1);
+            return;
+        }
+        CharSequence before = ic.getTextBeforeCursor(32, 0);
+        int len = lastGraphemeLength(before);
+        if (len > 1) {
+            ic.deleteSurroundingText(len, 0); // whole emoji at once
         } else {
             sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL);
         }
@@ -485,5 +513,238 @@ public class VoiceIme extends InputMethodService implements RecognitionListener 
         boolean noEnter = (info.imeOptions & EditorInfo.IME_FLAG_NO_ENTER_ACTION) != 0;
         enterBtn.setImageResource(!noEnter && action == EditorInfo.IME_ACTION_SEND
                 ? R.drawable.ic_send : R.drawable.ic_enter);
+    }
+
+    // ---------------------------------------------------------------- emoji
+
+    private static final String[] TAB_ICONS = {"🕘", "😀", "❤️", "👍", "🐻", "🍕", "⚽", "🌸", "💡", "🔣"};
+
+    private static final String[] CATEGORIES = {
+            "", // recents
+            // smileys
+            "😀 😃 😄 😁 😆 😅 🤣 😂 🙂 🙃 😉 😊 😇 🥰 😍 🤩 😘 😗 ☺️ 😚 😙 🥲 😋 😛 😜 🤪 😝 🤑 🤗 🤭 🤫 🤔 🤐 🤨 😐 😑 😶 😏 😒 🙄 😬 😮‍💨 🤥 😌 😔 😪 🤤 😴 😷 🤒 🤕 🤢 🤮 🤧 🥵 🥶 🥴 😵 🤯 🤠 🥳 🥸 😎 🤓 🧐 😕 😟 🙁 ☹️ 😮 😯 😲 😳 🥺 😦 😧 😨 😰 😥 😢 😭 😱 😖 😣 😞 😓 😩 😫 🥱 😤 😡 😠 🤬 😈 👿 💀 ☠️ 💩 🤡 👹 👺 👻 👽 🤖 😺 😸 😹 😻 😼 😽 🙀 😿 😾 🙈 🙉 🙊",
+            // hearts & love
+            "❤️ 🧡 💛 💚 💙 💜 🖤 🤍 🤎 💔 ❣️ 💕 💞 💓 💗 💖 💘 💝 💟 ❤️‍🔥 ❤️‍🩹 💋 💌 💐 🌹 🥀 😍 🥰 😘 😻 💑 💏 👩‍❤️‍👨 💍 🫶 🤟 💯 ✨ 💫 ⭐ 🌟 🔥",
+            // people & gestures
+            "👍 👎 👌 🤌 🤏 ✌️ 🤞 🤟 🤘 🤙 👈 👉 👆 👇 ☝️ ✋ 🤚 🖐️ 🖖 👋 👏 🙌 👐 🤲 🤝 🙏 ✍️ 💪 🦾 🫶 🙋 🙋‍♂️ 🙋‍♀️ 🤷 🤷‍♂️ 🤷‍♀️ 🤦 🤦‍♂️ 🤦‍♀️ 🙇 🙆 🙅 💁 🙎 🙍 👶 🧒 👦 👧 🧑 👨 👩 🧓 👴 👵 👮 👷 💂 🕵️ 👩‍⚕️ 👨‍⚕️ 👩‍🎓 👨‍🎓 👩‍🏫 👨‍🏫 👩‍💻 👨‍💻 👰 🤵 🤰 🧕 👨‍👩‍👧 👨‍👩‍👦 👪 🗣️ 👤 👥 👀 👁️ 👂 👃 👄 🧠",
+            // animals & nature
+            "🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐸 🐵 🐔 🐧 🐦 🐤 🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🐛 🦋 🐌 🐞 🐜 🕷️ 🐢 🐍 🦎 🐙 🦑 🦀 🐡 🐠 🐟 🐬 🐳 🐋 🦈 🐊 🐅 🐆 🦓 🦍 🐘 🦛 🦏 🐪 🐫 🦒 🐃 🐂 🐄 🐎 🐖 🐏 🐑 🐐 🦌 🐕 🐈 🐓 🦃 🕊️ 🐇 🐿️ 🦔",
+            // food
+            "🍏 🍎 🍐 🍊 🍋 🍌 🍉 🍇 🍓 🫐 🍈 🍒 🍑 🥭 🍍 🥥 🥝 🍅 🍆 🥑 🥦 🥬 🥒 🌶️ 🌽 🥕 🧄 🧅 🥔 🍠 🥐 🍞 🥖 🧀 🥚 🍳 🥞 🥓 🍗 🍖 🌭 🍔 🍟 🍕 🥪 🌮 🌯 🥗 🍝 🍜 🍲 🍛 🍣 🍱 🥟 🍚 🍙 🍘 🍥 🍢 🍡 🍧 🍨 🍦 🥧 🧁 🍰 🎂 🍮 🍭 🍬 🍫 🍿 🍩 🍪 🌰 🥜 🍯 🥛 ☕ 🍵 🧃 🥤 🧋 🧊",
+            // activities & travel
+            "⚽ 🏀 🏈 ⚾ 🎾 🏐 🏉 🎱 🏓 🏸 🥅 🏒 🏏 ⛳ 🏹 🎣 🥊 🥋 ⛸️ 🎿 🏋️ 🤸 🚴 🏊 🧗 🏆 🥇 🥈 🥉 🏅 🎖️ 🎗️ 🎫 🎟️ 🎭 🎨 🎬 🎤 🎧 🎼 🎹 🥁 🎷 🎺 🎸 🎻 🎲 🎯 🎳 🎮 🧩 🚗 🚕 🚙 🚌 🏎️ 🚓 🚑 🚒 🚚 🚜 🏍️ 🚲 🛴 ✈️ 🚀 🚁 ⛵ 🚢 🚆 🚇 🗺️ 🏠 🏡 🏢 🏥 🏦 🏫 🕌 ⛰️ 🏔️ 🏕️ 🏖️ 🏝️ 🌋 🗽 🎡 🎢",
+            // nature & weather
+            "🌸 🌺 🌻 🌼 🌷 🌹 🥀 💐 🌱 🌲 🌳 🌴 🌵 🌾 🌿 ☘️ 🍀 🍁 🍂 🍃 🍄 🌍 🌎 🌏 🌕 🌙 🌛 ⭐ 🌟 ✨ ⚡ ☄️ 💥 🔥 🌪️ 🌈 ☀️ 🌤️ ⛅ 🌥️ ☁️ 🌦️ 🌧️ ⛈️ 🌩️ 🌨️ ❄️ ☃️ ⛄ 🌬️ 💨 💧 💦 ☔ 🌊",
+            // objects
+            "💡 🔦 🕯️ 📱 💻 ⌨️ 🖥️ 🖨️ 🖱️ 💾 💿 📷 📸 📹 🎥 📞 ☎️ 📺 📻 ⏰ ⏳ ⌛ 🔋 🔌 💰 💵 💳 💎 ⚖️ 🔧 🔨 🛠️ ⚙️ 🔑 🗝️ 🔒 🔓 🚪 🛏️ 🛋️ 🚿 🛁 🧹 🧺 🧼 🛒 🎁 🎈 🎉 🎊 ✉️ 📩 📦 📝 📌 📎 ✂️ 📚 📖 📅 📆 🗓️ 📈 📉 📊 💊 💉 🩺 🧸 👓 🕶️ 👔 👕 👖 👗 👙 👠 👟 🎒 👜 💼 ⌚",
+            // symbols
+            "✅ ☑️ ✔️ ❌ ❎ ➕ ➖ ➗ ✖️ ❓ ❔ ❕ ❗ ‼️ ⁉️ 💯 🔴 🟠 🟡 🟢 🔵 🟣 ⚫ ⚪ 🟤 🔺 🔻 🔸 🔹 🔶 🔷 ▶️ ⏸️ ⏹️ ⏺️ ⏩ ⏪ 🔼 🔽 ⬆️ ⬇️ ⬅️ ➡️ ↩️ ↪️ 🔄 🔃 🔀 🔁 🆗 🆕 🆓 🆒 🆘 ⛔ 🚫 ⚠️ 🔞 ♻️ 💤 💬 💭 🗯️ ♥️ ♦️ ♣️ ♠️ 🎵 🎶 ☮️ ☪️ 🕉️ ☯️ ✡️ ♾️ ©️ ®️ ™️ 🇮🇷"
+    };
+
+    private int dp(float v) {
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v,
+                getResources().getDisplayMetrics()));
+    }
+
+    @SuppressWarnings("deprecation")
+    private int color(int res) {
+        return getResources().getColor(res);
+    }
+
+    /** Wraps the voice layout and an emoji panel in one container; adds the 😊 key. */
+    private View buildRootWithEmoji(View voiceRoot) {
+        voicePanel = (LinearLayout) voiceRoot;
+        loadRecents();
+
+        // --- 😊 key in the bottom row, next to the punctuation keys
+        View space = voiceRoot.findViewById(R.id.space);
+        LinearLayout bottomRow = (LinearLayout) space.getParent();
+        TextView emojiKey = makeKey("😊", 21);
+        LinearLayout.LayoutParams klp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+        klp.setMargins(dp(3), dp(3), dp(3), dp(3));
+        bottomRow.addView(emojiKey, 0, klp);
+        LinearLayout.LayoutParams slp = (LinearLayout.LayoutParams) space.getLayoutParams();
+        slp.weight = 2.4f;
+        space.setLayoutParams(slp);
+        emojiKey.setOnClickListener(x -> { haptic(x); showEmojiPanel(); });
+
+        // --- emoji panel
+        emojiPanel = new LinearLayout(this);
+        emojiPanel.setOrientation(LinearLayout.VERTICAL);
+        emojiPanel.setBackgroundColor(color(R.color.kb_bg));
+        emojiPanel.setPadding(dp(6), dp(4), dp(6), dp(8));
+        emojiPanel.setVisibility(View.GONE);
+        emojiPanel.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+
+        // category tabs
+        HorizontalScrollView tabScroll = new HorizontalScrollView(this);
+        tabScroll.setHorizontalScrollBarEnabled(false);
+        LinearLayout tabs = new LinearLayout(this);
+        tabs.setOrientation(LinearLayout.HORIZONTAL);
+        for (int i = 0; i < TAB_ICONS.length; i++) {
+            final int idx = i;
+            TextView t = new TextView(this);
+            t.setText(TAB_ICONS[i]);
+            t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+            t.setGravity(Gravity.CENTER);
+            t.setTextColor(color(R.color.kb_text));
+            LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(dp(44), dp(40));
+            tlp.setMargins(dp(1), 0, dp(1), 0);
+            t.setOnClickListener(x -> { haptic(x); selectCategory(idx); });
+            tabs.addView(t, tlp);
+            emojiTabs.add(t);
+        }
+        tabScroll.addView(tabs);
+        emojiPanel.addView(tabScroll, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(42)));
+
+        // grid
+        emojiGrid = new GridView(this);
+        emojiGrid.setColumnWidth(dp(46));
+        emojiGrid.setNumColumns(GridView.AUTO_FIT);
+        emojiGrid.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
+        emojiGrid.setVerticalSpacing(dp(2));
+        emojiGrid.setSelector(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+        emojiAdapter = new EmojiAdapter();
+        emojiGrid.setAdapter(emojiAdapter);
+        emojiGrid.setOnItemClickListener((parent, view, position, id) -> {
+            haptic(view);
+            String e = emojiAdapter.getItem(position);
+            commit(e);
+            addRecent(e);
+        });
+        emojiPanel.addView(emojiGrid, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(160)));
+
+        // bottom bar: back to voice | space | backspace
+        LinearLayout bar = new LinearLayout(this);
+        bar.setOrientation(LinearLayout.HORIZONTAL);
+        TextView back = makeKey("🎤", 20);
+        back.setOnClickListener(x -> { haptic(x); showVoicePanel(); });
+        TextView sp = makeKey("␣", 20);
+        sp.setOnClickListener(x -> { haptic(x); commit(" "); });
+        ImageView del = new ImageView(this);
+        del.setImageResource(R.drawable.ic_backspace);
+        del.setScaleType(ImageView.ScaleType.CENTER);
+        del.setBackgroundResource(R.drawable.key_bg);
+        del.setOnTouchListener(this::onBackspaceTouch);
+        bar.addView(back, barParams(1.3f));
+        bar.addView(sp, barParams(3f));
+        bar.addView(del, barParams(1.3f));
+        emojiPanel.addView(bar, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
+
+        // --- container holding both panels
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setBackgroundColor(color(R.color.kb_bg));
+        root.addView(voiceRoot, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        root.addView(emojiPanel, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return root;
+    }
+
+    private LinearLayout.LayoutParams barParams(float w) {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, w);
+        lp.setMargins(dp(3), dp(3), dp(3), dp(3));
+        return lp;
+    }
+
+    private TextView makeKey(String label, int sp) {
+        TextView t = new TextView(this);
+        t.setText(label);
+        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
+        t.setGravity(Gravity.CENTER);
+        t.setTextColor(color(R.color.kb_text));
+        t.setBackgroundResource(R.drawable.key_bg);
+        return t;
+    }
+
+    private void showEmojiPanel() {
+        if (emojiPanel == null) return;
+        cancelRecognition();
+        voicePanel.setVisibility(View.GONE);
+        emojiPanel.setVisibility(View.VISIBLE);
+        selectCategory(recents.isEmpty() ? 1 : (emojiCategory < 0 ? 0 : emojiCategory));
+    }
+
+    private void showVoicePanel() {
+        if (emojiPanel == null) return;
+        emojiPanel.setVisibility(View.GONE);
+        voicePanel.setVisibility(View.VISIBLE);
+        if (!listening) setIdleStatus();
+    }
+
+    private void selectCategory(int idx) {
+        emojiCategory = idx;
+        List<String> items = idx == 0
+                ? new ArrayList<String>(recents)
+                : Arrays.asList(CATEGORIES[idx].trim().split("\\s+"));
+        emojiAdapter.setItems(items);
+        emojiGrid.setSelection(0);
+        for (int i = 0; i < emojiTabs.size(); i++) {
+            if (i == idx) emojiTabs.get(i).setBackgroundResource(R.drawable.key_bg);
+            else emojiTabs.get(i).setBackgroundColor(Color.TRANSPARENT);
+        }
+    }
+
+    private void loadRecents() {
+        recents.clear();
+        String s = prefs.getString("recent_emoji", "");
+        if (!s.isEmpty()) recents.addAll(Arrays.asList(s.split(SEP)));
+    }
+
+    private void addRecent(String e) {
+        recents.remove(e);
+        recents.add(0, e);
+        while (recents.size() > MAX_RECENTS) recents.remove(recents.size() - 1);
+        prefs.edit().putString("recent_emoji", TextUtils.join(SEP, recents)).apply();
+    }
+
+    /** Length (in chars) of the last user-visible character, so an emoji is deleted in one go. */
+    private static int lastGraphemeLength(CharSequence text) {
+        if (text == null || text.length() == 0) return 0;
+        String s = text.toString();
+        int end = s.length();
+        int start;
+        if (Build.VERSION.SDK_INT >= 24) {
+            android.icu.text.BreakIterator bi = android.icu.text.BreakIterator.getCharacterInstance();
+            bi.setText(s);
+            start = bi.preceding(end);
+        } else {
+            java.text.BreakIterator bi = java.text.BreakIterator.getCharacterInstance();
+            bi.setText(s);
+            start = bi.preceding(end);
+        }
+        if (start < 0) start = 0;
+        return end - start;
+    }
+
+    private class EmojiAdapter extends BaseAdapter {
+        private List<String> items = new ArrayList<>();
+
+        void setItems(List<String> list) {
+            items = list;
+            notifyDataSetChanged();
+        }
+
+        @Override public int getCount() { return items.size(); }
+        @Override public String getItem(int position) { return items.get(position); }
+        @Override public long getItemId(int position) { return position; }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TextView t = (TextView) convertView;
+            if (t == null) {
+                t = new TextView(VoiceIme.this);
+                t.setGravity(Gravity.CENTER);
+                t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 26);
+                t.setTextColor(Color.WHITE);
+                t.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(46)));
+            }
+            t.setText(items.get(position));
+            return t;
+        }
     }
 }
